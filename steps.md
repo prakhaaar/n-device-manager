@@ -10,6 +10,7 @@
 #created dashboard/page.tsx
 #protected route to access after login
 now well do database and api creation work
+
 #4 — Collecting User Metadata (Full Name + Phone Number)
 
 #collecting phone numbers and users metadata
@@ -34,3 +35,17 @@ Result==>User profile data is stored in Redis successfully.
            Loads Redis profile data for that user.
            If profile is incomplete → redirects to /completeprofile
            Result===>Private page structure ready , Auth guard implemented
+
+#6==>setup device limit
+a==>We created an API route: app/api/device/register/route.ts.
+It identifies the logged-in user using auth0.getSession().
+
+        b==>Generates a unique device ID and collects device info (browser, OS, time).
+
+        c==>Stores the device in Redis under devices:{userId}.
+
+        d==>Uses a Lua script to enforce the 3-device limit and returns OK or limit-exceeded.
+
+#7===>We added one small client-side component that runs automatically whenever the user opens the dashboard.
+
+This component sends a request to our backend==> “Hey server, this device is active. Register it.”
