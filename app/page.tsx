@@ -19,8 +19,9 @@ export default function Home() {
       {/* Navbar */}
       <Header />
 
-      {/* Hero */}
+      {/* Hero Section */}
       <section className="flex-1 flex flex-col items-center justify-center text-center px-6 relative z-10">
+        {/* HERO CARD */}
         <motion.div
           initial={{ opacity: 0, y: 25 }}
           animate={{ opacity: 1, y: 0 }}
@@ -52,16 +53,70 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
           >
-            <Link href="/auth/login">
+            <Link href="/auth/login?returnTo=/dashboard">
               <Button className="bg-linear-to-r from-indigo-600 via-blue-600 to-sky-500 hover:from-indigo-700 hover:to-sky-600 text-white px-8 py-4 text-base rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
                 Login with Auth0
               </Button>
             </Link>
           </motion.div>
         </motion.div>
+
+        {/* ABOUT SECTION */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="mt-20 max-w-4xl mx-auto text-center space-y-8 px-4"
+        >
+          <h2 className="text-3xl font-semibold bg-linear-to-r from-indigo-700 to-blue-700 bg-clip-text text-transparent">
+            What is N-Device Session Security?
+          </h2>
+
+          <p className="text-gray-700 text-lg leading-relaxed">
+            This mini application is built as part of a Frontend Developer
+            Internship assignment. It showcases a real-world security feature
+            used in streaming apps, banking portals, and SaaS dashboards —{" "}
+            <span className="font-semibold">
+              limiting how many devices a user can stay logged in on
+              simultaneously.
+            </span>
+          </p>
+
+          <p className="text-gray-600 leading-relaxed">
+            For this demo, the limit is configured as <strong>N = 3</strong>.
+            When a fourth device attempts to log in, the user must:
+          </p>
+
+          <ul className="text-left max-w-2xl mx-auto text-gray-700 space-y-2">
+            <li>• Cancel the login attempt</li>
+            <li>• Or force-logout one of their existing devices</li>
+          </ul>
+
+          <p className="text-gray-600 leading-relaxed">
+            Any device that gets force-logged-out receives a friendly message
+            explaining the reason, ensuring clarity & transparency.
+          </p>
+
+          <h3 className="text-2xl font-semibold mt-10">
+            Technologies & Services Used
+          </h3>
+
+          <p className="text-gray-700 leading-relaxed">
+            This project uses <strong>Next.js</strong> for the frontend,{" "}
+            <strong>Auth0</strong> for authentication, and
+            <strong> Upstash Redis</strong> for device/session tracking all
+            free-tier and serverless.
+          </p>
+
+          <ul className="text-left max-w-2xl mx-auto text-gray-700 space-y-2">
+            <li>• Global Session Storage</li>
+            <li>• Zero maintenance</li>
+            <li>• Edge-fast performance</li>
+            <li>• Secure authentication pipeline</li>
+          </ul>
+        </motion.div>
       </section>
 
-      {/* Footer */}
       <Footer />
     </main>
   );

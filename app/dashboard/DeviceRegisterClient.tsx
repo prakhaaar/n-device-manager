@@ -19,7 +19,11 @@ function getOrCreateDeviceId() {
   return id;
 }
 
-export default function DeviceRegisterClient() {
+export default function DeviceRegisterClient({
+  onRegistered,
+}: {
+  onRegistered?: () => void;
+}) {
   const [limitDevices, setLimitDevices] = useState<any[] | null>(null);
   const [currentDeviceId, setCurrentDeviceId] = useState<string | null>(null);
   const [processing, setProcessing] = useState(false);
@@ -39,7 +43,11 @@ export default function DeviceRegisterClient() {
 
       if (data.exceeded || data.error === "DEVICE_LIMIT_REACHED") {
         setLimitDevices(data.devices);
+        return; // stop here, do NOT validate
       }
+
+      // registration successful
+      onRegistered?.();
     }
 
     register();
@@ -84,11 +92,6 @@ export default function DeviceRegisterClient() {
 
               <Button
                 disabled={processing || d.deviceId === currentDeviceId}
-                className={`${
-                  d.deviceId === currentDeviceId
-                    ? "opacity-50 cursor-not-allowed"
-                    : ""
-                }`}
                 onClick={async () => {
                   setProcessing(true);
 

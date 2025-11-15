@@ -61,7 +61,17 @@ export default function ActiveDevices() {
     typeof window !== "undefined" ? localStorage.getItem("deviceId") : null;
 
   return (
-    <Card className="lg:col-span-1 p-6">
+    <Card
+      className="
+      lg:col-span-1 p-6 rounded-2xl 
+      bg-white/30 dark:bg-white/10 
+      backdrop-blur-xl 
+      border border-white/20 dark:border-white/10 
+      shadow-[0_8px_32px_rgba(31,38,135,0.15)]
+      transition-all duration-300
+      hover:bg-white/40 hover:shadow-[0_10px_40px_rgba(31,38,135,0.25)]
+    "
+    >
       <div className="mb-6 flex items-center gap-2">
         <Smartphone className="h-5 w-5 text-primary" />
         <h2 className="text-xl font-semibold text-foreground">
@@ -76,7 +86,14 @@ export default function ActiveDevices() {
           return (
             <div
               key={device.deviceId}
-              className="rounded-lg border border-border bg-background p-4 transition-shadow hover:shadow-md"
+              className="
+                rounded-xl p-4 
+                bg-white/20 dark:bg-white/5 
+                backdrop-blur-lg 
+                border border-white/20 dark:border-white/10
+                shadow-sm transition-all duration-300
+                hover:shadow-lg hover:bg-white/30
+              "
             >
               <div className="mb-2 flex items-start justify-between">
                 <div className="flex-1">
@@ -92,7 +109,14 @@ export default function ActiveDevices() {
                 </div>
 
                 {isCurrent && (
-                  <Badge variant="default" className="text-xs">
+                  <Badge
+                    variant="default"
+                    className="
+                        text-xs bg-primary/20 text-primary 
+                        border border-primary/30 
+                        backdrop-blur-md
+                      "
+                  >
                     Current
                   </Badge>
                 )}
@@ -102,7 +126,13 @@ export default function ActiveDevices() {
                 <Button
                   variant="destructive"
                   size="sm"
-                  className="mt-2 w-full flex gap-2"
+                  className="
+                    mt-2 w-full flex gap-2 
+                    rounded-lg 
+                    bg-red-500/80 hover:bg-red-600 
+                    text-white shadow 
+                    backdrop-blur-xl
+                  "
                   onClick={() => forceLogout(device.deviceId)}
                 >
                   <LogOut className="h-4 w-4" />
@@ -114,7 +144,15 @@ export default function ActiveDevices() {
         })}
       </div>
 
-      <div className="mt-6 rounded-lg bg-primary/5 p-4">
+      {/* Footer summary */}
+      <div
+        className="
+        mt-6 rounded-xl p-4 
+        bg-primary/10 dark:bg-primary/20 
+        backdrop-blur-lg 
+        border border-primary/20 
+      "
+      >
         <p className="text-sm text-muted-foreground">
           <span className="font-semibold text-foreground">
             {devices.length}/{MAX_DEVICES}
@@ -123,7 +161,7 @@ export default function ActiveDevices() {
         </p>
 
         {devices.length >= MAX_DEVICES && (
-          <p className="mt-1 text-xs text-red-600">
+          <p className="mt-1 text-xs text-red-600 font-medium">
             Maximum device limit reached
           </p>
         )}

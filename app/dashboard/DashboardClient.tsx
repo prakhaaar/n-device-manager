@@ -1,15 +1,14 @@
 "use client";
 
+import { useState } from "react";
 import { useDeviceValidation } from "@/components/useDeviceValidation";
 import DashboardUI from "./DashboardUI";
 import DeviceRegisterWrapper from "./DeviceRegisterWrapper";
 import ActiveDevices from "@/components/ActiveDevices";
+import Footer from "@/components/Footer";
 
 interface DashboardClientProps {
-  profile: {
-    fullName: string;
-    phone: string;
-  };
+  profile: { fullName: string; phone: string };
   email: string;
 }
 
@@ -17,23 +16,21 @@ export default function DashboardClient({
   profile,
   email,
 }: DashboardClientProps) {
-  // Validate forced logout (deleted devices)
-  useDeviceValidation();
+  const [deviceRegistered, setDeviceRegistered] = useState(false);
+
+  // Validate only AFTER registration completes
+  useDeviceValidation(deviceRegistered);
 
   return (
     <>
-      {/* Main dashboard UI */}
       <DashboardUI
         fullName={profile.fullName}
         phone={profile.phone}
         email={email}
       />
-
-      {/* Registers this device + popup if N devices limit exceeded */}
-      <DeviceRegisterWrapper />
-
-      {/* Shows all active devices */}
-      <ActiveDevices />
+      {/* Register device first */}
+      <DeviceRegisterWrapper onRegistered={() => setDeviceRegistered(true)} />]
+      <Footer />
     </>
   );
 }

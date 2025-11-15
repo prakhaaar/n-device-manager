@@ -4,6 +4,8 @@ import { redis } from "@/lib/redis";
 
 export const runtime = "nodejs";
 
+const MAX_DEVICES = 3;
+
 export async function GET(req: Request) {
   try {
     const session = await auth0.getSession();
@@ -16,7 +18,6 @@ export async function GET(req: Request) {
 
     const userId = session.user.sub;
     const key = `devices:${userId}`;
-
     const deviceId = req.headers.get("x-device-id");
 
     if (!deviceId) {
@@ -26,16 +27,33 @@ export async function GET(req: Request) {
       );
     }
 
-    const exists = await redis.hget(key, deviceId);
+    const raw = await redis.hgetall(key);
+    const devices = Object.values(raw ?? {});
+    const count = devices.length;
 
-    if (!exists) {
+    // If device is not in allowed list -> force logout
+    if (!raw || !raw[deviceId]) {
       return NextResponse.json(
-        { valid: false, reason: "FORCED_LOGOUT" },
+        {
+          valid: false,
+          enforcedLogout: true,
+          reason: "FORCED_LOGOUT",
+          count,
+          max: MAX_DEVICES,
+          devices,
+        },
         { status: 401 }
       );
     }
 
-    return NextResponse.json({ valid: true });
+    const isAllowed = count <= MAX_DEVICES;
+
+    return NextResponse.json({
+      valid: isAllowed,
+      count,
+      max: MAX_DEVICES,
+      devices,
+    });
   } catch (err) {
     console.error("DEVICE VALIDATE ERROR:", err);
     return NextResponse.json({ error: "SERVER_ERROR" }, { status: 500 });

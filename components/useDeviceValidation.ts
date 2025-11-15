@@ -2,8 +2,10 @@
 
 import { useEffect } from "react";
 
-export function useDeviceValidation() {
+export function useDeviceValidation(deviceRegistered: boolean) {
   useEffect(() => {
+    if (!deviceRegistered) return;
+
     async function validate() {
       const deviceId = localStorage.getItem("deviceId");
       if (!deviceId) return;
@@ -26,5 +28,5 @@ export function useDeviceValidation() {
     }
 
     validate();
-  }, []);
+  }, [deviceRegistered]);
 }

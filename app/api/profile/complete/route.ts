@@ -4,16 +4,12 @@ import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
-    // For API routes, call getSession() without arguments
     const session = await auth0.getSession();
-
     if (!session?.user) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { fullName, phone } = body;
-
+    const { fullName, phone } = await req.json();
     if (!fullName || !phone) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -29,7 +25,8 @@ export async function POST(req: Request) {
       phone,
     });
 
-    return NextResponse.json({ success: true });
+    // 🔥 KEY: force redirect from server
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   } catch (error) {
     console.error("Profile save error:", error);
     return NextResponse.json(

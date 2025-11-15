@@ -6,28 +6,36 @@ import DashboardClient from "./DashboardClient";
 export default async function DashboardPage() {
   const session = await auth0.getSession();
 
-  if (!session?.user) {
-    redirect("/auth/login");
-  }
+  if (!session?.user) redirect("/auth/login");
 
   const userId = session.user.sub;
-  const raw = await redis.hgetall(`profile:${userId}`);
 
-  const profile = raw as unknown as {
-    fullName?: string;
-    phone?: string;
-  };
+  // 🔥 Tell TypeScript what shape Redis can return
+  const raw = (await redis.hgetall(`profile:${userId}`)) as Record<
+    string,
+    string | object
+  > | null;
 
-  if (!profile.fullName || !profile.phone) {
+  // 🔥 Safely extract values
+  const fullName =
+    typeof raw?.fullName === "string"
+      ? raw.fullName
+      : (raw?.fullName as any)?.fullName ?? null;
+
+  const phone =
+    typeof raw?.phone === "string"
+      ? raw.phone
+      : (raw?.phone as any)?.phone ?? null;
+
+  // 🔥 New users → redirect
+  if (!fullName || !phone) {
     redirect("/completeprofile");
   }
 
-  const typedProfile = {
-    fullName: profile.fullName!,
-    phone: profile.phone!,
-  };
-
   return (
-    <DashboardClient profile={typedProfile} email={session.user.email || ""} />
+    <DashboardClient
+      profile={{ fullName, phone }}
+      email={session.user.email || ""}
+    />
   );
 }
