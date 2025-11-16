@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useDeviceValidation } from "@/components/useDeviceValidation";
 import DashboardUI from "./DashboardUI";
-import DeviceRegisterWrapper from "./DeviceRegisterWrapper";
-import ActiveDevices from "@/components/ActiveDevices";
+import DeviceRegisterClient from "./DeviceRegisterClient";
 import Footer from "@/components/Footer";
 
 interface DashboardClientProps {
@@ -29,7 +28,7 @@ export default function DashboardClient({
         email={email}
       />
       {/* Register device first */}
-      <DeviceRegisterWrapper onRegistered={() => setDeviceRegistered(true)} />]
+      <DeviceRegisterClient onRegistered={() => setDeviceRegistered(true)} />
       <Footer />
     </>
   );

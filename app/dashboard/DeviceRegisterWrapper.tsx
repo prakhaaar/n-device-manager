@@ -2,6 +2,12 @@
 
 import DeviceRegisterClient from "./DeviceRegisterClient";
 
-export default function DeviceRegisterWrapper() {
-  return <DeviceRegisterClient />;
+interface DeviceRegisterWrapperProps {
+  onRegistered?: () => void; // allow optional callback
+}
+
+export default function DeviceRegisterWrapper({
+  onRegistered,
+}: DeviceRegisterWrapperProps) {
+  return <DeviceRegisterClient onRegistered={onRegistered} />;
 }

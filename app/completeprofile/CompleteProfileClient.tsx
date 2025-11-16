@@ -69,7 +69,7 @@ export default function CompleteProfileClient() {
           className="relative bg-white/70 backdrop-blur-xl border border-zinc-200
           rounded-3xl shadow-lg px-10 py-12 w-full max-w-lg"
         >
-          <h1 className="text-3xl font-semibold text-gray-800 mb-6 text-center bg-linear-to-r from-gray-800 via-black to-gray-700 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-semibold text-transparent mb-6 text-center bg-linear-to-r from-gray-800 via-black to-gray-700 bg-clip-text text-transparent">
             Complete Your Profile
           </h1>
 

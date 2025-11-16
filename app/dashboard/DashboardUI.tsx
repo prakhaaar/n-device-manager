@@ -27,7 +27,7 @@ export default function DashboardUI({
     .toUpperCase();
 
   return (
-    <main className="relative min-h-screen flex flex-col overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-sky-50">
+    <main className="relative min-h-screen flex flex-col overflow-hidden bg-linear-to-br from-indigo-50 via-white to-sky-50">
       {/* Background Aurora */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-[10%] left-[15%] w-[400px] h-[400px] bg-indigo-300/30 rounded-full blur-[100px]" />
@@ -55,7 +55,7 @@ export default function DashboardUI({
         >
           {/* Title */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-semibold bg-gradient-to-r from-gray-800 to-black bg-clip-text text-transparent leading-tight">
+            <h1 className="text-4xl md:text-5xl font-semibold bg-linear-to-r from-gray-800 to-black bg-clip-text text-transparent leading-tight">
               Your Secure Dashboard
             </h1>
             <p className="text-gray-700 mt-2">
@@ -113,7 +113,7 @@ export default function DashboardUI({
             <Button
               className="
                 mt-4 w-full max-w-md py-3 rounded-xl 
-                bg-gradient-to-r from-indigo-600 via-blue-600 to-sky-500 
+                bg-linear-to-r from-indigo-600 via-blue-600 to-sky-500 
                 hover:from-indigo-700 hover:to-sky-600 
                 text-white shadow-lg hover:shadow-xl 
                 transition-all duration-300
