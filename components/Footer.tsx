@@ -23,7 +23,7 @@ export default function Footer() {
         <span className="text-gray-400">|</span>
 
         <a
-          href="https://linkedin.com/in/mprakhar07"
+          href="https://www.linkedin.com/in/prakhar-mishra-52b71a257/"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1 hover:text-indigo-600 transition"
