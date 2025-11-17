@@ -108,19 +108,6 @@ export default function DashboardUI({
                 value={phone}
               />
             </div>
-
-            {/* Edit Button */}
-            <Button
-              className="
-                mt-4 w-full max-w-md py-3 rounded-xl 
-                bg-linear-to-r from-indigo-600 via-blue-600 to-sky-500 
-                hover:from-indigo-700 hover:to-sky-600 
-                text-white shadow-lg hover:shadow-xl 
-                transition-all duration-300
-              "
-            >
-              Edit Profile
-            </Button>
           </div>
         </motion.div>
 

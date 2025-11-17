@@ -6,16 +6,19 @@ import CompleteProfileClient from "./CompleteProfileClient";
 export default async function CompleteProfilePage() {
   const session = await auth0.getSession();
 
-  // Not logged in → send to login
-  if (!session?.user) {
-    redirect("/auth/login");
-  }
+  if (!session?.user) redirect("/auth/login");
 
   const userId = session.user.sub;
-  const profile = await redis.hgetall(`profile:${userId}`);
 
-  // If profile is already complete → do NOT allow accessing this page
-  if (profile?.fullName && profile?.phone) {
+  let profile: Record<string, string> | null = null;
+  try {
+    profile = await redis.hgetall(`profile:${userId}`);
+  } catch (err) {
+    console.error("Redis error fetching profile:", err);
+    profile = null;
+  }
+
+  if (profile && profile.fullName && profile.phone) {
     redirect("/dashboard");
   }
 
