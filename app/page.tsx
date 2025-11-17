@@ -75,7 +75,7 @@ export default function Home() {
           <p className="text-gray-700 text-lg leading-relaxed">
             This mini application is built as part of a Frontend Developer
             Internship assignment. It showcases a real-world security feature
-            used in streaming apps, banking portals, and SaaS dashboards —{" "}
+            used in streaming apps, banking portals, and SaaS dashboards{" "}
             <span className="font-semibold">
               limiting how many devices a user can stay logged in on
               simultaneously.
