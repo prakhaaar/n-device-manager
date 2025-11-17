@@ -32,6 +32,32 @@ This project demonstrates **N-device concurrent session management** (N=3) using
 
 ---
 
+## 📸 UI Screenshots
+
+### Landing Page
+
+![Landing Page](githubimage/landing.png)
+
+### Signup Page
+
+![Signup Page](githubimage/signup.png)
+
+### Dashboard
+
+![Dashboard](githubimage/dashboard.png)
+
+### Active Device List
+
+![Device List](githubimage/devicelist.png)
+
+### Edit Profile Page
+
+![Edit Profile](githubimage/edit%20profle.png)
+
+### Thanks Page
+
+![Thanks Page](githubimage/thanks.png)
+
 ## 🚀 Setup Steps
 
 ### 1. Prerequisites
