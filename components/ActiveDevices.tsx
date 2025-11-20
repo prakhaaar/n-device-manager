@@ -23,21 +23,21 @@ export default function ActiveDevices() {
   const pollRef = useRef<number | null>(null);
   const MAX_DEVICES = 3;
 
-  // Fetch devices from the server and update state.
   async function fetchDevices() {
     try {
       const res = await fetch("/api/device/list", {
         method: "GET",
         credentials: "same-origin",
-        headers: {
-          Accept: "application/json",
-        },
+        headers: { Accept: "application/json" },
       });
 
       if (!res.ok) {
-        // If unauthorized, treat as empty & bail out
         if (res.status === 401) {
-          // If the user is not authenticated, redirect to login (safe fallback)
+          // Stop polling BEFORE redirect
+          if (pollRef.current) {
+            clearInterval(pollRef.current);
+            pollRef.current = null;
+          }
           window.location.href = "/auth/login";
           return;
         }
@@ -49,20 +49,26 @@ export default function ActiveDevices() {
       const list: DeviceEntry[] = Array.isArray(data.devices)
         ? data.devices
         : [];
-
       setDevices(list);
 
-      // If current device is missing from the returned list -> we were force-logged-out
+      // If current device was force-logged-out
       const currentDeviceId =
         typeof window !== "undefined" ? localStorage.getItem("deviceId") : null;
+
       if (
         currentDeviceId &&
         !list.some((d) => d.deviceId === currentDeviceId)
       ) {
-        // Clean up local device id and redirect to logged-out
         try {
           localStorage.removeItem("deviceId");
         } catch {}
+
+        // Stop polling BEFORE redirect
+        if (pollRef.current) {
+          clearInterval(pollRef.current);
+          pollRef.current = null;
+        }
+
         window.location.href = "/logged-out?forced=1";
         return;
       }
@@ -73,10 +79,8 @@ export default function ActiveDevices() {
     }
   }
 
-  // Force-logout a device. If we removed the current device, redirect immediately.
   async function forceLogout(deviceId: string) {
     try {
-      // mark processing for this device
       setProcessingIds((s) => ({ ...s, [deviceId]: true }));
 
       const res = await fetch("/api/device/force-logout", {
@@ -86,25 +90,34 @@ export default function ActiveDevices() {
         headers: { "Content-Type": "application/json" },
       });
 
-      // if unauthorized, send to login
       if (res.status === 401) {
+        // Stop polling BEFORE redirect
+        if (pollRef.current) {
+          clearInterval(pollRef.current);
+          pollRef.current = null;
+        }
         window.location.href = "/auth/login";
         return;
       }
 
-      // If you forced logout your own device — redirect immediately
       const currentId =
         typeof window !== "undefined" ? localStorage.getItem("deviceId") : null;
+
       if (currentId === deviceId) {
-        // remove the device id locally (safety) and redirect
         try {
           localStorage.removeItem("deviceId");
         } catch {}
+
+        // Stop polling BEFORE redirect
+        if (pollRef.current) {
+          clearInterval(pollRef.current);
+          pollRef.current = null;
+        }
+
         window.location.href = "/logged-out?forced=1";
         return;
       }
 
-      // Otherwise refresh the list
       await fetchDevices();
     } catch (err) {
       console.error("Force logout failed:", err);
@@ -118,10 +131,8 @@ export default function ActiveDevices() {
   }
 
   useEffect(() => {
-    // initial fetch
     fetchDevices();
 
-    // poll every 12s to keep device list fresh and detect remote force-logout
     pollRef.current = window.setInterval(() => {
       fetchDevices();
     }, 12000);
@@ -132,8 +143,7 @@ export default function ActiveDevices() {
         pollRef.current = null;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // run once on mount
+  }, []);
 
   if (loading) {
     return (
@@ -240,7 +250,6 @@ export default function ActiveDevices() {
         })}
       </div>
 
-      {/* Footer summary */}
       <div
         className="
         mt-6 rounded-xl p-4 
