@@ -1,4 +1,3 @@
-// dashboard/DeviceRegisterClient.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -12,11 +11,18 @@ import { Button } from "@/components/ui/button";
 
 function getOrCreateDeviceId() {
   if (typeof window === "undefined") return null;
-  let id = localStorage.getItem("deviceId");
+
+  const id = localStorage.getItem("deviceId");
+
+  // ❌ If forced-logged-out, DO NOT recreate a new device ID
+  if (id === "FORCED_LOGGED_OUT") return null;
+
   if (!id) {
-    id = crypto.randomUUID();
-    localStorage.setItem("deviceId", id);
+    const newId = crypto.randomUUID();
+    localStorage.setItem("deviceId", newId);
+    return newId;
   }
+
   return id;
 }
 
@@ -30,34 +36,66 @@ export default function DeviceRegisterClient({
   const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
+    // 🛑 1. Do NOT register on /logged-out page
+    if (window.location.pathname.includes("logged-out")) return;
+
+    // 🛑 2. Do NOT run if already registered once in this session
+    if (sessionStorage.getItem("deviceRegisteredOnce") === "true") return;
+
     async function register() {
+      // Get or create deviceId
       const deviceId = getOrCreateDeviceId();
+
+      // 🛑 If deviceId is null → means forced-logout happened → do NOT register
+      if (!deviceId) return;
+
       setCurrentDeviceId(deviceId);
 
       const res = await fetch("/api/device/register", {
         method: "POST",
+        credentials: "include", // ✔ IMPORTANT FIX
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ deviceId }),
       });
 
       const data = await res.json();
 
+      // If limit reached, show modal
       if (data.exceeded || data.error === "DEVICE_LIMIT_REACHED") {
         setLimitDevices(data.devices);
         return;
       }
 
-      // Registration successful - notify parent
+      // If server says device already exists → don’t re-register
+      if (data.alreadyExists === true) {
+        sessionStorage.setItem("deviceRegisteredOnce", "true");
+        onRegistered?.();
+        return;
+      }
+
+      // Successful registration
+      sessionStorage.setItem("deviceRegisteredOnce", "true");
       onRegistered?.();
     }
 
-    // ⚠️ KEY FIX: Wait 1 second before registering
-    // This gives Auth0 callback time to complete
-    const timeout = setTimeout(register, 1000);
+    // Wait until session is ready, not arbitrary delay
+    async function waitForSession() {
+      for (let i = 0; i < 10; i++) {
+        const me = await fetch("/api/auth/me", { credentials: "include" });
+        if (me.ok) return true;
+        await new Promise((r) => setTimeout(r, 200));
+      }
+      return false;
+    }
 
-    return () => clearTimeout(timeout);
+    // Run registration AFTER Auth0 session is stable
+    (async () => {
+      const ok = await waitForSession();
+      if (ok) register();
+    })();
   }, [onRegistered]);
 
+  // UI
   if (!limitDevices) return null;
 
   return (
@@ -102,9 +140,13 @@ export default function DeviceRegisterClient({
 
                   await fetch("/api/device/force-logout", {
                     method: "POST",
+                    credentials: "include",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ deviceId: d.deviceId }),
                   });
+
+                  // Mark that device must NOT auto-register again
+                  localStorage.setItem("deviceId", "FORCED_LOGGED_OUT");
 
                   window.location.reload();
                 }}
@@ -118,7 +160,11 @@ export default function DeviceRegisterClient({
         <Button
           variant="outline"
           className="mt-3 w-full"
-          onClick={() => (window.location.href = "/logged-out")}
+          onClick={() => {
+            // Mark forced logout
+            localStorage.setItem("deviceId", "FORCED_LOGGED_OUT");
+            window.location.href = "/logged-out";
+          }}
         >
           Cancel Login
         </Button>

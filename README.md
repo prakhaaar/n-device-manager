@@ -589,7 +589,6 @@ https://your-project.vercel.app
 ⚠️ **Device detection:** Based on localStorage (not hardware fingerprinting)
 ⚠️ **Polling frequency:** Validation runs once after registration (not continuous)
 ⚠️ **Concurrent logins:** 4th device must actively force logout (not automatic)
-⚠️ **Browser data clearing:** User can bypass by clearing localStorage (acceptable for demo)
 
 ### Future Improvements
 

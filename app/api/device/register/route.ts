@@ -9,10 +9,8 @@ const MAX_DEVICES = 3;
 function safeParse(val: any) {
   if (!val) return null;
 
-  // Already object
-  if (typeof val === "object") return val;
+  if (typeof val === "object") return val; // already parsed
 
-  // Try parsing JSON string
   if (typeof val === "string") {
     try {
       return JSON.parse(val);
@@ -45,16 +43,24 @@ export async function POST(req: Request) {
     const key = `devices:${userId}`;
 
     // 1. Read devices safely
-    const raw = (await redis.hgetall(key)) || {};
+    const raw: Record<string, any> = (await redis.hgetall(key)) || {};
 
     const devices = Object.values(raw).map(safeParse).filter(Boolean);
-
     const count = devices.length;
 
-    // 2. Enforce device limit BEFORE adding
     const isExistingDevice = !!raw[deviceId];
 
-    if (count >= MAX_DEVICES && !isExistingDevice) {
+    // ⭐ NEW FIX: If device already exists → do not re-register
+    if (isExistingDevice) {
+      return NextResponse.json({
+        success: true,
+        alreadyExists: true,
+        deviceId,
+      });
+    }
+
+    // 2. Enforce 3-device limit BEFORE adding a new one
+    if (count >= MAX_DEVICES) {
       return NextResponse.json({
         exceeded: true,
         count,
@@ -63,7 +69,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // 3. Register or update device
+    // 3. Register new device
     const entry = {
       deviceId,
       ua: req.headers.get("user-agent") ?? "",
@@ -77,7 +83,8 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       exceeded: false,
-      count: isExistingDevice ? count : count + 1,
+      deviceId,
+      count: count + 1,
     });
   } catch (err) {
     console.error("REGISTER DEVICE ERROR:", err);
