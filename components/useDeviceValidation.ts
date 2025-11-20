@@ -1,3 +1,4 @@
+// components/useDeviceValidation.ts
 "use client";
 
 import { useEffect } from "react";
@@ -36,14 +37,16 @@ export function useDeviceValidation(deviceRegistered: boolean) {
       }
     }
 
-    // 🔥 Run immediately on mount
-    validate();
+    // ⚠️ KEY FIX: Wait 2 seconds before first validation
+    // This prevents validation from running during Auth0 callback
+    const initialTimeout = setTimeout(validate, 2000);
 
-    // 🔥 Poll every 12 seconds
-    const interval = setInterval(() => validate(), 12000);
+    // Poll every 12 seconds after that
+    const interval = setInterval(validate, 12000);
 
     return () => {
       active = false;
+      clearTimeout(initialTimeout);
       clearInterval(interval);
     };
   }, [deviceRegistered]);
