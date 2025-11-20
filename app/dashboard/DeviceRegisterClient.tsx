@@ -1,3 +1,4 @@
+// dashboard/DeviceRegisterClient.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -43,15 +44,19 @@ export default function DeviceRegisterClient({
 
       if (data.exceeded || data.error === "DEVICE_LIMIT_REACHED") {
         setLimitDevices(data.devices);
-        return; // stop here, do NOT validate
+        return;
       }
 
-      // registration successful
+      // Registration successful - notify parent
       onRegistered?.();
     }
 
-    register();
-  }, []);
+    // ⚠️ KEY FIX: Wait 1 second before registering
+    // This gives Auth0 callback time to complete
+    const timeout = setTimeout(register, 1000);
+
+    return () => clearTimeout(timeout);
+  }, [onRegistered]);
 
   if (!limitDevices) return null;
 
